@@ -1,587 +1,96 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <title>SheDiamond Invitation Checker</title>
+  <title>SheDiamond Guest List Editor</title>
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
-      background-color: #fff0f5;
-      color: #333;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
-    }
-    .container {
-      width: 90%;
+      font-family: Arial, sans-serif;
       max-width: 500px;
-      margin-top: 10px;
-      text-align: center;
-      background-color: #ffffff;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin: auto;
+      padding: 20px;
     }
-    img.logo {
-      width: 200px;
-      margin-bottom: 10px;
-    }
-    img.flyer {
+    input, button {
       width: 100%;
-      margin-top: 20px;
-      border-radius: 10px;
-    }
-    h2 {
-      color: #990066;
-      margin-bottom: 10px;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      margin-top: 15px;
-    }
-    button {
-      background-color: #990066;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      font-size: 16px;
-      margin-top: 15px;
-      border-radius: 6px;
-      cursor: pointer;
-      width: 100%;
-    }
-    button:hover {
-      background-color: #7a004f;
-    }
-    .message {
-      margin-top: 20px;
-      font-size: 16px;
-      padding: 15px;
-      border-radius: 8px;
-    }
-    .success {
-      background-color: #e0ffe0;
-      color: #006600;
-    }
-    .error {
-      background-color: #ffe0e0;
-      color: #990000;
-    }
-    .notice {
-      width: 100%;
-      background-color: #ffffcc;
       padding: 10px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 15px;
-      border-top: 1px solid #999;
-      border-bottom: 1px solid #999;
-      position: sticky;
-      top: 0;
+      margin-top: 10px;
+    }
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div class="notice">
-    ⚠️ Entry is strictly by reservation SMS. Please arrive early!
+  <h2>SheDiamond List Editor</h2>
+  <div id="login">
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="authenticate()">Login</button>
   </div>
 
-  <div class="container">
-    <img src="SheDiamondLogo.jpeg" alt="SheDiamond Logo" class="logo">
-    <h2>Check Your Invitation</h2>
-    <input type="tel" id="phoneInput" placeholder="Enter your phone number" />
-    <button onclick="checkInvite()">Check My Status</button>
-    <div id="message" class="message"></div>
-    <img src="SheDiamondFlyer.jpeg" alt="Event Flyer" class="flyer" />
+  <div id="form" class="hidden">
+    <input type="text" id="phone" placeholder="Phone (e.g. 08012345678)" />
+    <input type="text" id="name" placeholder="Name (e.g. Ma)" />
+    <button onclick="addContact()">Add to List</button>
+    <p id="status"></p>
   </div>
 
   <script>
-    const selectedGuests = {
-    "08025327714": "Ada",
-  "09034551934": "Chinaza",
-  "08165406004": "Ada Victoria",
-  "09059241807": "Anu Akinwale",
-  "08024310331": "Mrs. Olamide",
-  "08127798472": "Ajoke Gold",
-  "08067213882": "Udeme Etuk",
-  "08028763428": "Mrs. Ayeni J",
-  "07025155528": "Olatubosun Olamide",
-  "07035840858": "Rukayat Seriki",
-  "07038628361": "Uba Augustina",
-  "08060008312": "Maureen .O",
-  "07035440321": "Ugochi Nwoke",
-  "08177246229": "Ugochi Nwoke",
-  "09026186519": "Dim Grace",
-  "09030244504": "Chiamaka Miracle",
-  "08133276438": "Abosede",
-  "07056469245": "Lady G",
-  "07012998302": "Ma",
-  "07013895554": "Ma",
-  "07014552554": "Ma",
-  "07015445089": "Ma",
-  "07017611922": "Ma",
-  "07019018273": "Ma",
-  "07025347206": "Ma",
-  "07030348358": "Ma",
-  "07031658803": "Ma",
-  "07031832848": "Ma",
-  "07032127407": "Ma",
-  "07032242317": "Ma",
-  "07033000722": "Ma",
-  "07034682450": "Ma",
-  "07035915666": "Ma",
-  "07036422487": "Ma",
-  "07037438202": "Ma",
-  "07038664021": "Ma",
-  "07038836191": "Ma",
-  "07039117627": "Ma",
-  "07046289172": "Ma",
-  "07056469245": "Ma",
-  "07057647418": "Ma",
-  "07060887451": "Ma",
-  "07061355326": "Ma",
-  "07061626393": "Ma",
-  "07062334803": "Ma",
-  "07063322881": "Ma",
-  "07064341744": "Ma",
-  "07065259220": "Ma",
-  "07065411342": "Ma",
-  "07065468260": "Ma",
-  "07066475948": "Ma",
-  "07078709505": "Ma",
-  "07083536606": "Ma",
-  "07084482012": "Ma",
-  "07085647232": "Ma",
-  "07088418834": "Ma",
-  "07089273306": "Ma",
-  "08021165990": "Ma",
-  "08023070264": "Ma",
-  "08023939661": "Ma",
-  "08024300735": "Ma",
-  "08024665757": "Ma",
-  "08025362774": "Ma",
-  "08025469519": "Ma",
-  "08025762303": "Ma",
-  "08025869505": "Ma",
-  "08026014766": "Ma",
-  "08027197256": "Ma",
-  "08027729291": "Ma",
-  "08027899490": "Ma",
-  "08030404397": "Ma",
-  "08031518357": "Ma",
-  "08031872179": "Ma",
-  "08033208041": "Ma",
-  "08033231056": "Ma",
-  "08033644468": "Ma",
-  "08033934080": "Ma",
-  "08035238499": "Ma",
-  "08035501131": "Ma",
-  "08035731718": "Ma",
-  "08036049308": "Ma",
-  "08037074783": "Ma",
-  "08037989128": "Ma",
-  "08039358318": "Ma",
-  "08039577517": "Ma",
-  "08056913297": "Ma",
-  "08061998698": "Ma",
-  "08062866650": "Ma",
-  "08064194499": "Ma",
-  "08067553108": "Ma",
-  "08068095965": "Ma",
-  "08068824323": "Ma",
-  "08070722586": "Ma",
-  "08082071494": "Ma",
-  "08085811907": "Ma",
-  "08085846481": "Ma",
-  "08100168426": "Ma",
-  "08104961863": "Ma",
-  "08107710522": "Ma",
-  "08114341146": "Ma",
-  "08115989065": "Ma",
-  "08126796716": "Ma",
-  "08128122699": "Ma",
-  "08129390072": "Ma",
-  "08132322187": "Ma",
-  "08132881156": "Ma",
-  "08133384063": "Ma",
-  "08134128308": "Ma",
-  "08134554913": "Ma",
-  "08141163368": "Ma",
-  "08143949067": "Ma",
-  "08148218604": "Ma",
-  "08154859523": "Ma",
-  "08164537450": "Ma",
-  "08164554248": "Ma",
-  "08165396945": "Ma",
-  "08165629362": "Ma",
-  "08165929458": "Ma",
-  "08166703518": "Ma",
-  "08168624664": "Ma",
-  "08169915916": "Ma",
-  "08082451528": "Ma",
-  "08018571554": "Ma",
-  "08188629474": "Ma",
-  "09072918798": "Ma",
-  "09015424505": "Ma",
-  "09016242954": "Ma",
-  "09017853815": "Ma",
-  "09021350067": "Ma",
-  "09022001501": "Ma",
-  "09032701009": "Ma",
-  "09041464333": "Ma",
-  "09047750953": "Ma",
-  "09048407497": "Ma",
-  "09054803641": "Ma",
-  "09054905174": "Ma",
-  "09064162218": "Ma",
-  "09066631381": "Ma",
-  "09066926264": "Ma",
-  "09067297618": "Ma",
-  "09067420562": "Ma",
-  "09074370907": "Ma",
-  "09075482468": "Ma",
-  "09084418301": "Ma",
-  "09098438531": "Ma",
-  "09121975649": "Ma",
-  "09127563658": "Ma",
-  "09151641598": "Ma",
-  "09153245927": "Ma",
-  "09155394845": "Ma",
-  "09165115257": "Ma",
-  "09166603818": "Ma",
-  "09167411051": "Ma",
-  "08037160608": "God's Favour",
-  "08134554913": "Ogunyebi Grace",
-  "08138849114": "Esther Ijeoma",
-  "08060043822": "Roseline Oluebube",
-  "09038594699": "Azom Chizoba",
-  "08065403036": "Ndu Hannah",
-  "08125244913": "Sarah",
-  "08146529716": "Adeleke Seyi",
-  "07062013566": "Jacqueline",
-  "08144580659": "Juliana Ife",
-  "08133845803": "Okeyinka Bukunmi",
-  "08138342964": "Mrs. Chijioke",
-  "08161183475": "Ijeoma Precious",
-  "08024310331": "Adeyemo Osaiyekemwen",
-  "08101747742": "Patricia Ukama",
-  "07026440186": "Standard Heritage",
-  "08133879067": "Madu Ijeoma",
-  "08062874720": "Mrs. Adeyinka",
-  "08100471271": "Ella",
-  "08058383543": "Mrs. Chioma",
-  "08030429116": "Akintunde Yetunde",
-  "09072837032": "Kazeem Kehinde",
-  "08032777500": "Linda Nneka",
-  "07066288418": "Ademola Olukunle",
-  "08083856474": "Lois Nkechi",
-  "08061763062": "Faith Obona",
-  "09024067152": "Laydichee",
-  "09024067152": "Laydichee",
-  "08146637923": "Kareem Damilola",
-  "08084771751": "Kemi Ajibade",
-  "07051359584": "Gloria",
-  "08137987999": "Anita Eneh",
-  "09167411051": "Ma",
-  "09014434459": "Lilian Vieve",
-  "07038089727": "Victoria Michael",
-  "07011098009": "Victoria Michael",
-  "08058383543": "Chioma Excellent",
-  "07065505532": "Success Chinenyeze",
-  "09068899217": "Okeke Chiwetara",
-  "07016977675": "Mariam Oluwabunmi",
-  "08185808291": "Sarah Sally",
-  "08138753324": "Richie Ipaye",
-  "08160497822": "Mrs. Funmilola",
-  "08163305304": "Elizabeth Oluwatosin",
-  "08035818920": "Cynthia Ogechi",
-  "09036508009": "Obinna Eunice",
-  "09021715050": "Precious Uche",
-  "07065277079": "Amusa Munat",
-  "09029914444": "Osuagwu Chinenye",
-  "08060675804": "Florence",
-  "07033630054": "Nneka Okafor",
-  "08035653093": "Toyin",
-  "08159664258": "Happy Ezekiel",
-  "08037850377": "Edith Onyekachi",
-  "08139188419": "Odejobi Adenike",
-  "07034507052": "Peculiar Bessong",
-  "09020682322": "Edem Blessing",
-  "08186029832": "Julius Imoleayo",
-  "09099984892": "Maureen Idaguko",
-  "08170402428": "Temitope Adepoju",
-  "08064961915": "Omeku Augusta",
-  "08067936984": "Vivian Ebere",
-  "08027798694": "Atinuke Adewuyi",
-  "08030906746": "Ethel Bashayim",
-  "08169808430": "Davit-Yalah Blessing",
-  "08092614631": "Sophia Kodoko",
-  "08082693100": "Happiness",
-  "08063536805": "Camel Rose",
-  "07039892410": "Rita Felix",
-  "07018008609": "Monye Loveth",
-  "08067792246": "Mary Gabriel",
-  "08056101181": "Adebanjo Kate",
-  "08063219660": "Olaitan A.",
-  "07034803930": "Wordworth Racheal M.",
-  "08039523790": "Shirley Clarise",
-  "08069525015": "Funmilayo Samuel",
-  "08034364871": "Abimbola Lawal",
-  "08039913336": "Vivian",
-  "08029439363": "Justina Ohonsi",
-  "07067757922": "Lolade Salami",
-  "08064489603": "Judith Obilor",
-  "09083937292": "Eyoma Glory",
-  "09115961501": "Abosede",
-  "07037399915": "Chinyere Cosmas",
-  "07083349820": "Ijeoma Uchechukwu",
-  "0816153521": "Amarachi",
-  "08177246229": "Nwoke Ugochi",
-  "07033349133": "Abimbola Omotayo",
-  "08071028928": "Loveth Onwumere",
-  "08067508400": "Amarachi",
-  "08024310331": "Adeshola Ayeni",
-  "09064238843": "Oluwatoyin Ifeoluwa",
-  "07038392672": "Ama Nsidibe",
-  "08135883989": "Dorcas",
-  "08113218441": "Adejumoke",
-  "08034368876": "Helen Mary",
-  "08088446843": "Elizabeth",
-  "09153061491": "Hassan Mayowa",
-  "07066700624": "Grace",
-  "08038776151": "Nzubechi",
-  "08026337323": "Ayokumi",
-  "08110017045": "Oluwatofunmilayo",
-  "07055111414": "Gift",
-  "08061284828": "Rafat Issa",
-  "09060531753": "Gamson Onyekachi",
-  "08155298521": "Dennis Janet",
-  "07015544129": "Ngozi Oguguo",
-  "09024514598": "Titilope Adedoyin",
-  "07086730630": "Oyinkansola",
-  "09049980084": "Shirley",
-  "08030906746": "Ethel Bashayim",
-  "08027798695": "⁠Atinuke Adewuyi",
-  "08055338360": "⁠Omolade A.",
-  "08033037113": "⁠Njideka Okolo",
-  "09032169858": "⁠Aderike",
-  "07018692802": "⁠Igwe Ifeoma",
-  "08084771751": "⁠Kemi Ajibade",
-  "08125826798": "⁠Tolulope",
-  "08131992482": "Precious Onyebuchi",
-  "08039432094": "Mfonobong Ekong",
-  "08033008051": "Osineye Modupe",
-  "09031109158": "Adeyeye Adenike",
-  "08158944396": "Gladys Isoken",
-  "08023652021": "Gladys Isoken",
-  "08025999267": "Iheanacho Chigozie",
-  "08024008191": "Yusuf Abiola",
-  "08034979774": "Chibuzo Faith",
-  "09137983363": "Deborah Imoudu",
-  "08062404868": "Aniebiet Edem",
-  "08051595257": "Charles Elizabeth",
-  "08167948438": "Folake Oluwatoyin",
-  "08133276438": "Abosede",
-  "07088686563": "Funmilayo",
-  "08062660305": "Quasim Olabisi",
-  "09035523963": "Juliet Nebo",
-  "09016049820": "Uzoma Linda",
-  "08069719908": "Emmanuel Gift",
-  "08187491629": "Adelsi Oseni",
-  "09024411787": "Orho Omene",
-  "08038362086": "Queen Awonuga",
-  "08174146450": "Funmilayo Palmer",
-  "08023783115": "Emmy Ntong",
-  "07037072256": "Jessica Nkwocha",
-  "07062509975": "Marvelous Samuel",
-  "07060590932": "Olorunkemi Olubisi",
-  "08058679019": "Oluwaseun Motunrayo",
-  "09025029649": "Blessing Ogbonna",
-  "09014268922": "Omotosho Oluwabusayo",
-  "08034979774": "Ma",
-  "08023151104": "Orekoya Bukola",
-  "08033138900": "Romanus Glory",
-  "07034733284": "Ma",
-  "08030644929": "Ma",
-  "08132984317": "Okafor Chidimma",
-  "07035058823": "Abimbola Pamisi",
-  "08068643418": "Mustapha Tawakalitu",
-  "08022572150": "Asu Folashade",
-  "08147604549": "Okoro Chiamaka",
-  "08165283883": "Ayinde Bolatito",
-  "08166497487": "Josephine Chinedum",
-  "07015254790": "Usili Theresa",
-  "07033576560": "Oji Chinonso Prisca",
-  "07058242175": "Princess Adetenisola",
-  "09083937292": "Eyoma Glory",
-  "07038510990": "Esther Godwin",
-  "07036893478": "Barmani Danaldi",
-  "08135116888": "Mesieobi Chinwendu",
-  "08170402428": "Adepoju Temitope",
-  "08037860240": "Patience Joseph",
-  "08064178703": "Nkafor Joy A.",
-  "09137480219": "Joy Simi Joshua",
-  "08038016384": "Godson Adaeze Chinedu",
-  "08035268544": "Christy",
-  "08027498388": "Mrs. Muritala",
-  "07070303179": "Onuh Ifeoma",
-  "07034733284": "Alo Comfort",
-  "09027535762": "Adesewa",
-  "09016350662": "Cecillia Omolade",
-  "07032427616": "Chizobam MacDonald",
-  "09132474430": "Adaobi Ezeh",
-  "08038037320": "Agboola Oluwatosin",
-  "08063219660": "Ma",
-  "08032625469": "Okolie Chinyere",
-  "08039301010": "Ma",
-  "08034867116": "Roseline Kalu",
-  "08038246041": "Betty Nmezi",
-  "08050798233": "Apata Hellen",
-  "07034803930": "Adewuyi Rachael",
-  "08035154861": "Ijeoma Rosecolet",
-  "09157294758": "Christiana Ojomo",
-  "08124356657": "Morenike Abimbola",
-  "08033187612": "Whitney Ayodele",
-  "09059060458": "Morenikeji",
-  "09027741928": "Ma",
-  "08051595257": "Charles Elizabeth",
-  "08142283845": "Gina",
-  "07037221586": "Nwandu Oluchi",
-  "08033355997": "Madam Uju",
-  "07068344095": "Joan Daniels",
-  "08038315290": "Ruth",
-  "08104576001": "Salome Ofoegbu",
-  "08167320262": "Oyelakin Abosede",
-  "08034790977": "Ma",
-  "07055111414": "Onyinye Gift",
-  "08145948338": "Ma",
-  "08138854715": "Gebeiofem",
-  "07038459199": "Jubril Morenike",
-  "07066700624": "Grace Ubong",
-  "09028445148": "Evelyn Gabriel",
-  "08023151104": "Orekoya Bukola",
-  "07052142408": "Ape Faith",
-  "80837899192": "Glory Abijo",
-  "08102702485": "Deborah",
-  "08103990188": "Chigozie Solange",
-  "08039301010": "Bukola Idowu",
-  "08088730749": "Sukurat Oluwaremilekun",
-  "08030697222": "Modesta Nneka",
-  "07015058568": "Rose Ukegbu",
-  "08033652997": "Chioma",
-  "08165283883": "Ayinde Bolatito",
-  "09016059416": "Abigail Joseph",
-  "08053226707": "Olanimi Banji",
-  "09151588112": "Christiana Johnson",
-  "07033750003": "Mrs. Bayo",
-  "08027105312": "Grace Doji",
-  "09018690585": "Omorolade",
-  "07033750003": "Mrs. Bayo Ejiro",
-  "09051677383": "Ma",
-  "08142283845": "Gina",
-  "07019018273": "Ma",
-  "07031832848": "Ma",
-  "07025155528": "Ma",
-  "09164757115": "Nina",
-  "08127488479": "Feranmi",
-  "08115377475": "Divine Favour",
-  "08182698026": "Amarachi Benedict",
-  "08023564321": "Oluwakemi Ajayi",
-  "08124197523": "Queen Ada",
-  "08034752708": "Ma",
-  "09150696778": "Ma",
-  "07045901941": "Faith",
-  "07066802860": "Oma",
-  "08139720325": "Onoyere",
-  "08130171007": "Stella",
-  "08186826393": "Ruth",
-  "07085961998": "Nkiru Sylvia",
-  "09132569123": "Oge",
-  "08166845424": "Rechael Chinyere",
-  "07012210690": "Nwankwo Nneka",
-  "08167316572": "Gloria Chinonso",
-  "08139188419": "Ma",
-  "08161598061": "Divine Dibofu",
-  "08130068054": "Nike",
-  "07033750003": "Bayo Ejiro",
-  "08153962027": "Paula Bankole",
-  "08138342964": "Obetta Chijioke Sarah",
-  "09037537643": "Christopher Deborah",
-  "08174386679": "Comfort",
-  "07087981509": "Shulamite",
-  "08178904530": "Ofem Precious",
-  "09092307612": "Adeyemi Maria",
-  "09095527249": "Blessing Chikordi",
-  "07046568332": "Regina Idiege",
-  "08030820648": "Jennifer Nwachukwu",
-  "08135072820": "Kemisola Ayaba",
-  "08038479291": "Patience Goodluck",
-  "09035999176": "Sylvia Okonkwo",
-  "08036849329": "Odumuyiwa Oyinkansola",
-  "08149691293": "Mokobia Favour",
-  "08105664097": "Akande Olabisi Kikelomo",
-  "07064580723": "Otori Oyiza Halimat",
-  "08160394546": "Olayinka Oshagbami",
-  "08086167309": "Chinaza Fred",
-  "08158300319": "Abisoye Martins",
-  "07038257268": "Elizabeth Oduobi",
-  "09168073850": "Adenike Adebayo",
-  "07013636950": "Akanbi Adeshola Elizabeth",
-  "08131536956": "Ojo Oluwaseun",
-  "08160213856": "Mustapha Olayinka",
-  "09028479191": "Akintade Temitope",
-  "07035485408": "Albert Modupe",
-  "07080806470": "Yekeen Taofeeqah",
-  "09095098914": "Bukola Mary",
-  "08053834599": "Juliet Eze",
-  "07065778154": "Roseline Adaeze Bernards",
-  "08036849329": "Odumuyiwa Oyinkansola",
-  "09069216853": "Amarachi Iwuchukwu",
-  "09062822807": "Seyifunmi",
-  "08178904530": "Annie",
-  "09064300327": "Clara Williams",
-  "08143690410": "Okonkwo Peculiar",
-  "08143921548": "Akinpelu Queen Elizabeth",
-  "09124687709": "Mogaji Peace Adunadura",
-  "08093156588": "Oyebitan Mopelola",
-  "07034343566": "Precious Nmalagu",
-  "08155534264": "Omowunmi Adebayo",
-  "07048272387": "Keturah Okobidi",
-  "08143921548": "Akinpelu Queen Elizabeth",
-  "08165993102": "Adebanjo Kikelomo Afolashade",
-  "08137480050": "Lydia Ikenma",
-  "07088624717": "⁠Ifeoma Prinsca",
-  "08133773480": "⁠Funmilayo Ayobo"
-    };
+    const GITHUB_TOKEN = "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";
+    const REPO = "SheDiamond-Approved-Attendance-List";
+    const FILE_PATH = "index.html";
+    const USERNAME = "Faith";
+    const PASSWORD = "1126";
 
-    function checkInvite() {
-      const input = document.getElementById("phoneInput").value.trim();
-      const messageDiv = document.getElementById("message");
-
-      if (selectedGuests[input]) {
-        const name = selectedGuests[input];
-        messageDiv.innerHTML = `
-          🎉 <strong>Congratulations ${name}!</strong><br><br>
-          You have been selected to attend <strong>The SheDiamond Event</strong><br>
-          on <strong>Today Being Saturday, 28th June 2025</strong>.<br><br>
-          Your Reservation Id <strong>CAE/4708</strong> has been sent to <strong>${input}</strong> via SMS.<br><br>
-          📞 Kindly reach out to <strong>Your Admin, Faith B.</strong> if you did not receive it.
-        `;
-        messageDiv.className = "message success";
+    function authenticate() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+      if (user === USERNAME && pass === PASSWORD) {
+        document.getElementById("login").classList.add("hidden");
+        document.getElementById("form").classList.remove("hidden");
       } else {
-        messageDiv.innerHTML = `❌ This number (<strong>${input}</strong>) is <strong>not on the invitation list</strong>.<br>Please contact Admin for clarification.`;
-        messageDiv.className = "message error";
+        alert("Incorrect login");
+      }
+    }
+
+    async function addContact() {
+      const phone = document.getElementById("phone").value.trim();
+      const name = document.getElementById("name").value.trim();
+      if (!phone || !name) {
+        alert("Please fill both fields");
+        return;
+      }
+      const response = await fetch(`https://api.github.com/repos/echosvile/${REPO}/contents/${FILE_PATH}`, {
+        headers: {
+          Authorization: `token ${GITHUB_TOKEN}`,
+        }
+      });
+      const data = await response.json();
+      let content = atob(data.content);
+
+      const insertLine = `  "${phone}": "${name}",\n`;
+      content = content.replace(/(\{\s*\n)(.*?)(\n\})/, `$1${insertLine}$2$3`);
+
+      const updateResponse = await fetch(`https://api.github.com/repos/echosvile/${REPO}/contents/${FILE_PATH}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `token ${GITHUB_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: `Add ${name} (${phone})`,
+          content: btoa(unescape(encodeURIComponent(content))),
+          sha: data.sha,
+        }),
+      });
+
+      if (updateResponse.ok) {
+        document.getElementById("status").innerText = "✅ Added successfully!";
+        document.getElementById("phone").value = "";
+        document.getElementById("name").value = "";
+      } else {
+        document.getElementById("status").innerText = "❌ Failed to update.";
       }
     }
   </script>
