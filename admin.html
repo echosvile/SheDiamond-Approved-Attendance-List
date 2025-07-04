@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>SheDiamond Admin Panel</title>
+  <style>
+    body { font-family: Arial; padding: 2rem; background: #f7f7f7; }
+    input, button { margin: 5px 0; padding: 10px; width: 100%; max-width: 400px; }
+    .hidden { display: none; }
+    #dashboard { margin-top: 2rem; }
+    .success { color: green; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h2>🔐 Admin Login</h2>
+  <div id="login">
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <p id="loginMsg" class="error"></p>
+  </div>
+
+  <div id="dashboard" class="hidden">
+    <h3>Add to Guest List</h3>
+    <input type="text" id="number" placeholder="Phone Number (e.g. 08012345678)" />
+    <input type="text" id="name" placeholder="Name (e.g. Ma)" />
+    <button onclick="addEntry()">Add to List</button>
+    <p id="status"></p>
+  </div>
+
+  <script>
+    const correctUsername = "Faith";
+    const correctPassword = "1126";
+
+    function login() {
+      const u = document.getElementById("username").value;
+      const p = document.getElementById("password").value;
+      if (u === correctUsername && p === correctPassword) {
+        document.getElementById("login").classList.add("hidden");
+        document.getElementById("dashboard").classList.remove("hidden");
+        document.getElementById("loginMsg").innerText = "";
+      } else {
+        document.getElementById("loginMsg").innerText = "Incorrect username or password.";
+      }
+    }
+
+    async function addEntry() {
+      const number = document.getElementById("number").value.trim();
+      const name = document.getElementById("name").value.trim();
+      const statusEl = document.getElementById("status");
+
+      if (!number || !name) {
+        statusEl.innerHTML = "<span class='error'>Both fields are required.</span>";
+        return;
+      }
+
+      statusEl.innerHTML = "⏳ Adding...";
+      const token = "{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}";
+      const repo = "SheDiamond-Approved-Attendance-List";
+      const owner = "{echosvile}";
+      const filePath = "list.json";
+      const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+
+      const getRes = await fetch(apiUrl, {
+        headers: { Authorization: `token ${token}` }
+      });
+
+      if (!getRes.ok) {
+        statusEl.innerHTML = "<span class='error'>Failed to fetch list.</span>";
+        return;
+      }
+
+      const file = await getRes.json();
+      const content = atob(file.content);
+      let json = JSON.parse(content);
+
+      const newJson = { [number]: name, ...json };
+
+      const newContent = btoa(JSON.stringify(newJson, null, 2));
+      const body = {
+        message: `Add ${name} (${number})`,
+        content: newContent,
+        sha: file.sha
+      };
+
+      const putRes = await fetch(apiUrl, {
+        method: "PUT",
+        headers: {
+          Authorization: `token ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (putRes.ok) {
+        statusEl.innerHTML = "<span class='success'>✅ Entry added successfully!</span>";
+        document.getElementById("number").value = "";
+        document.getElementById("name").value = "";
+      } else {
+        statusEl.innerHTML = "<span class='error'>❌ Failed to update list.</span>";
+      }
+    }
+  </script>
+</body>
+</html>
