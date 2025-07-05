@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SheDiamond Invitation Checker</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url('flyer.jpg') no-repeat center center fixed;
+      background-size: cover;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(7px);
+      -webkit-backdrop-filter: blur(7px);
+      animation: fadein 1.5s ease-in-out;
+      z-index: 0;
+    }
+
+    @keyframes fadein {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 500px;
+      margin: 4rem auto;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .logo {
+      max-width: 120px;
+      margin: 0 auto 1rem;
+    }
+
+    h1 {
+      color: #d63384;
+      margin-bottom: 1rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #d63384;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      margin-top: 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #b92c6a;
+    }
+
+    .message {
+      margin-top: 1.5rem;
+      font-size: 17px;
+    }
+
+    .success { color: green; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="logo.png" alt="SheDiamond Logo" class="logo" />
+    <h1>Check Your Invitation</h1>
+    <p>Enter your phone number to verify if you're invited:</p>
+    <input type="text" id="phoneInput" placeholder="e.g. 08012345678" />
+    <br/>
+    <button onclick="checkInvite()">Check</button>
+    <div id="message" class="message"></div>
+  </div>
+
+  <script>
+    let selectedGuests = {};
+
+    fetch('list.json')
+      .then(response => response.json())
+      .then(data => {
+        selectedGuests = data;
+      })
+      .catch(error => {
+        document.getElementById("message").innerHTML = "❌ Failed to load guest list. Please try again later.";
+        console.error("Fetch error:", error);
+      });
+
+    function checkInvite() {
+      const input = document.getElementById("phoneInput").value.trim();
+      const messageDiv = document.getElementById("message");
+
+      if (selectedGuests[input]) {
+        const name = selectedGuests[input];
+        messageDiv.innerHTML = `
+          🎉 <strong>Congratulations ${name}!</strong><br><br>
+          You have been selected to attend <strong>The SheDiamond Event</strong><br>
+          on <strong>Saturday, 28th June 2025</strong>.<br><br>
+          Your reservation has been sent to <strong>${input}</strong> via SMS.<br><br>
+          📞 Kindly reach out to <strong>Admin Faith B.</strong> if you did not receive it.
+        `;
+        messageDiv.className = "message success";
+      } else {
+        messageDiv.innerHTML = \`❌ This number (<strong>\${input}</strong>) is <strong>not on the invitation list</strong>.<br>Please contact Admin for clarification.\`;
+        messageDiv.className = "message error";
+      }
+    }
+  </script>
+</body>
+</html>
