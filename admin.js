@@ -6,7 +6,7 @@ async function addGuestToList(name, number) {
   const username = "echosvile";
   const file = "list.json";
 
-  const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${file}`;
+  const apiUrl = `https://api.github.com/repos/echosvile/SheDiamond-Approved-Attendance-List/contents/list.json`;
 
   try {
     // Get current list.json content and SHA
