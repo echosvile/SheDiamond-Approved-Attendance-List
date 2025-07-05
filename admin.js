@@ -1,7 +1,7 @@
 // admin.js — handles adding new entries and committing to GitHub
 
 async function addGuestToList(name, number) {
-  const token = "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";
+  const token = "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";
   const repo = "SheDiamond-Approved-Attendance-List";
   const username = "echosvile";
   const file = "list.json";
