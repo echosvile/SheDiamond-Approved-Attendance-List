@@ -1,60 +1,67 @@
 // admin.js — handles adding new entries and committing to GitHub
 
 async function addGuestToList(name, number) {
-  const token = "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";
-  const repo = "SheDiamond-Approved-Attendance-List";
+  const token = "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"; // 🔐 Replace this!
   const username = "echosvile";
+  const repo = "SheDiamond-Approved-Attendance-List";
   const file = "list.json";
 
   const apiUrl = `https://api.github.com/repos/echosvile/SheDiamond-Approved-Attendance-List/contents/list.json`;
+  console.log("📡 Connecting to:", apiUrl);
 
   try {
-    // Get current list.json content and SHA
     const getRes = await fetch(apiUrl, {
       headers: { Authorization: `token ${token}` }
     });
+
+    console.log("✅ GET response status:", getRes.status);
+
+    if (!getRes.ok) {
+      const errorText = await getRes.text();
+      console.error("❌ Failed to fetch list.json:", errorText);
+      alert("❌ Failed to fetch list.json. Check console.");
+      return;
+    }
+
     const getData = await getRes.json();
     const content = JSON.parse(atob(getData.content));
     const sha = getData.sha;
 
-    // Insert new guest entry at the top
-    const updatedList = { [number]: name, ...content };
+    console.log("📦 Current SHA:", sha);
+    console.log("📒 Current list:", content);
 
-    // Encode new list.json
+    const updatedList = { [number]: name, ...content };
     const encoded = btoa(JSON.stringify(updatedList, null, 2));
 
-    // Commit back to GitHub
+    const commitBody = {
+      message: `Added ${name} (${number})`,
+      content: encoded,
+      sha
+    };
+
+    console.log("📨 Commit payload:", commitBody);
+
     const commitRes = await fetch(apiUrl, {
       method: "PUT",
       headers: {
         Authorization: `token ${token}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        message: `Added ${name} to list.json`,
-        content: encoded,
-        sha
-      })
+      body: JSON.stringify(commitBody)
     });
+
+    console.log("🔄 PUT response status:", commitRes.status);
 
     if (commitRes.ok) {
       alert(`✅ ${name} (${number}) added successfully.`);
     } else {
-      alert("❌ Failed to commit to GitHub.");
-      console.error(await commitRes.text());
+      const errorText = await commitRes.text();
+      console.error("❌ Commit failed:", errorText);
+      alert("❌ Failed to commit. Check console for details.");
     }
-  } catch (err) {
-    alert("❌ Error occurred. Check console.");
-    console.error(err);
-  }
-}
 
-function handleSubmit() {
-  const name = document.getElementById("name").value.trim();
-  const number = document.getElementById("number").value.trim();
-  if (!name || !number) {
-    alert("Please enter both name and number.");
-    return;
+  } catch (err) {
+    console.error("❌ JS error:", err);
+    alert("❌ Error occurred. See console.");
   }
-  addGuestToList(name, number);
 }
