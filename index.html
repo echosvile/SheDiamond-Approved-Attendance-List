@@ -12,18 +12,12 @@
       background: url('flyer.jpg') no-repeat center center fixed;
       background-size: cover;
       animation: fadeIn 2s ease-in-out;
-      overflow: hidden;
       position: relative;
     }
 
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
-    }
-
-    @keyframes sparkle {
-      0% { transform: translateY(0) scale(1); opacity: 0.6; }
-      100% { transform: translateY(-100vh) scale(0.5); opacity: 0; }
     }
 
     .sparkle {
@@ -35,6 +29,13 @@
       opacity: 0.6;
       animation: sparkle linear infinite;
       z-index: 0;
+      pointer-events: none;
+      touch-action: none;
+    }
+
+    @keyframes sparkle {
+      0% { transform: translateY(0) scale(1); opacity: 0.6; }
+      100% { transform: translateY(-100vh) scale(0.5); opacity: 0; }
     }
 
     .container, .result-container {
@@ -48,7 +49,7 @@
       -webkit-backdrop-filter: blur(5px);
       text-align: center;
       position: relative;
-      z-index: 1;
+      z-index: 2;
     }
 
     .logo {
@@ -161,7 +162,7 @@
     <img src="logo.jpeg" alt="Logo" class="logo" />
     <h1>Check Your Invitation</h1>
     <div id="countdown"></div>
-    <input type="tel" inputmode="numeric" pattern="[0-9]*" id="phoneInput" placeholder="Enter your phone number" />
+    <input type="tel" id="phoneInput" placeholder="Enter your phone number" />
     <button onclick="checkInvite()">Check Status</button>
     <div id="message" class="message"></div>
   </div>
@@ -210,13 +211,12 @@
       if (data && data[input]) {
         const name = data[input];
         resultDiv.innerHTML = `
-          <strong style="color: #d63384;">Congratulations ${name}!</strong><br><br>
-          You have been selected to attend <strong>The SheDiamond Event</strong><br>
-          on <strong>Saturday, 28th June 2025</strong>.<br><br>
+          <strong style="color:#d63384">Congratulations ${name}!</strong><br><br>
+          You have been selected to attend <strong style="color:#d63384">The SheDiamond Event</strong><br>
+          on <strong style="color:#d63384">Saturday, 28th June 2025</strong>.<br><br>
           Your reservation has been sent to <strong>${input}</strong> via SMS.<br><br>
-          📞 Kindly reach out to <strong>Admin Faith B.</strong> if you didn’t receive it.
+          📞 Kindly reach out to <strong style="color:#d63384">Admin Faith B.</strong> if you didn’t receive it.
         `;
-        // Show result screen
         document.getElementById("checker-section").style.display = "none";
         document.getElementById("result-section").style.display = "block";
       } else {
