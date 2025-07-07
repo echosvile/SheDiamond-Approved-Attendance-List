@@ -171,35 +171,40 @@
 
     let selectedGuests = {};
 
-    fetch('list.json')
-      .then(response => response.json())
-      .then(data => {
-        selectedGuests = data;
-      })
+    function loadGuestList() {
+  return fetch(`list.json?${Date.now()}`)
+    .then(response => response.json())
+    .catch(error => {
+      document.getElementById("message").innerHTML = "❌ Failed to load guest list.";
+      console.error("Fetch error:", error);
+    });
+}
       .catch(error => {
         document.getElementById("message").innerHTML = "❌ Failed to load guest list. Please try again later.";
         console.error("Fetch error:", error);
       });
 
-    function checkInvite() {
-      const input = document.getElementById("phoneInput").value.trim();
-      const messageDiv = document.getElementById("message");
+    async function checkInvite() {
+  const input = document.getElementById("phoneInput").value.trim();
+  const messageDiv = document.getElementById("message");
 
-      if (selectedGuests[input]) {
-        const name = selectedGuests[input];
-        messageDiv.innerHTML = `
-          🎉 <strong>Congratulations ${name}!</strong><br><br>
-          You have been selected to attend <strong>The SheDiamond Event</strong><br>
-          on <strong>Saturday, 28th June 2025</strong>.<br><br>
-          Your reservation has been sent to <strong>${input}</strong> via SMS.<br><br>
-          📞 Kindly reach out to <strong>Admin Faith B.</strong> if you did not receive it.
-        `;
-        messageDiv.className = "message success";
-      } else {
-        messageDiv.innerHTML = `❌ This number (<strong>${input}</strong>) is <strong>not on the invitation list</strong>.<br>Please contact Admin for clarification.`;
-        messageDiv.className = "message error";
-      }
-    }
+  const data = await loadGuestList();
+
+  if (data && data[input]) {
+    const name = data[input];
+    messageDiv.innerHTML = `
+      🎉 <strong>Congratulations ${name}!</strong><br><br>
+      You have been selected to attend <strong>The SheDiamond Event</strong><br>
+      on <strong>Saturday, 28th June 2025</strong>.<br><br>
+      Your reservation has been sent to <strong>${input}</strong> via SMS.<br><br>
+      📞 Kindly reach out to <strong>Admin Faith B.</strong> if you did not receive it.
+    `;
+    messageDiv.className = "message success";
+  } else {
+    messageDiv.innerHTML = `❌ This number (<strong>${input}</strong>) is <strong>not on the invitation list</strong>.<br>Please contact Admin for clarification.`;
+    messageDiv.className = "message error";
+  }
+}
 
     document.getElementById("phoneInput").addEventListener("keyup", function(e) {
       if (e.key === "Enter") checkInvite();
