@@ -8,39 +8,17 @@
     body {
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background: url('flyer.jpg') no-repeat center center fixed;
       background-size: cover;
       animation: fadeIn 2s ease-in-out;
-      position: relative;
       overflow: hidden;
+      position: relative;
     }
 
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
-    }
-
-    @keyframes slideFadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes pulse {
-      0%, 100% {
-        transform: scale(1);
-        opacity: 1;
-      }
-      50% {
-        transform: scale(1.03);
-        opacity: 0.95;
-      }
     }
 
     @keyframes sparkle {
@@ -56,54 +34,60 @@
       border-radius: 50%;
       opacity: 0.6;
       animation: sparkle linear infinite;
+      z-index: 0;
     }
 
-    .container {
-      position: relative;
-      z-index: 2;
+    .container, .result-container {
       max-width: 500px;
-      margin: 4rem auto;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 12px;
+      margin: 3rem auto;
+      background: rgba(255, 255, 255, 0.75);
+      border-radius: 16px;
       padding: 2rem;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
       text-align: center;
-      animation: slideFadeIn 1.5s ease forwards;
+      position: relative;
+      z-index: 1;
     }
 
     .logo {
-      max-width: 120px;
+      max-width: 100px;
+      display: block;
       margin: 0 auto 1rem;
       animation: pulse 6s ease-in-out infinite;
     }
 
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.03); opacity: 0.9; }
+    }
+
     h1 {
       color: #d63384;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
     }
 
     #countdown {
-      font-size: 16px;
-      font-weight: bold;
-      margin-top: -5px;
-      margin-bottom: 15px;
+      font-size: 15px;
+      font-weight: 600;
       color: #444;
+      margin-bottom: 1.5rem;
     }
 
     input[type="tel"] {
       width: 100%;
       padding: 12px;
       font-size: 16px;
-      margin-top: 10px;
       border-radius: 6px;
       border: 1px solid #ccc;
+      margin-bottom: 1rem;
     }
 
     input[type="tel"]:focus {
+      border-color: #d63384;
+      box-shadow: 0 0 8px rgba(214, 51, 132, 0.5);
       outline: none;
-      border: 2px solid #d63384;
-      box-shadow: 0 0 8px rgba(214, 51, 132, 0.6);
-      transition: 0.3s ease;
     }
 
     button {
@@ -111,11 +95,9 @@
       color: white;
       border: none;
       padding: 12px 20px;
-      margin-top: 12px;
       font-size: 16px;
       border-radius: 6px;
       cursor: pointer;
-      transition: background 0.3s ease;
     }
 
     button:hover {
@@ -123,36 +105,46 @@
     }
 
     .message {
-      margin-top: 1.5rem;
       font-size: 17px;
+      margin-top: 1.5rem;
     }
 
-    .success {
-      color: #d63384;
-      font-weight: bold;
-      line-height: 1.6;
-    }
-
+    .success { color: green; }
     .error { color: red; }
 
-    .congrats-display {
-      background: rgba(255,255,255,0.96);
-      border-radius: 12px;
-      padding: 2rem;
-      margin-top: 1.5rem;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-      animation: slideFadeIn 1s ease-in-out;
+    .result-container {
+      display: none;
+      animation: fadeIn 1s ease-in-out;
     }
 
-    .emoji {
-      font-size: 48px;
-      margin-bottom: 10px;
+    .congrats-icon {
+      font-size: 60px;
+      color: #d63384;
+      animation: bounce 1.2s ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%   { transform: translateY(-30px); opacity: 0; }
+      50%  { transform: translateY(5px); }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    .back-btn {
+      margin-top: 2rem;
+      background: transparent;
+      border: 2px solid #d63384;
+      color: #d63384;
+    }
+
+    .back-btn:hover {
+      background: #d63384;
+      color: white;
     }
   </style>
 </head>
 <body>
 
-  <!-- Sparkle effect -->
+  <!-- Sparkles -->
   <script>
     for (let i = 0; i < 25; i++) {
       const sparkle = document.createElement("div");
@@ -164,20 +156,30 @@
     }
   </script>
 
-  <div class="container" id="mainBox">
-    <img src="logo.jpeg" alt="SheDiamond Logo" class="logo" />
+  <!-- Entry Form Section -->
+  <div class="container" id="checker-section">
+    <img src="logo.jpeg" alt="Logo" class="logo" />
     <h1>Check Your Invitation</h1>
     <div id="countdown"></div>
-    <p>Enter your phone number to verify if you're invited:</p>
-    <input type="tel" id="phoneInput" placeholder="e.g. 08012345678" inputmode="numeric" pattern="[0-9]*" />
+    <input type="tel" inputmode="numeric" pattern="[0-9]*" id="phoneInput" placeholder="Enter your phone number" />
     <button onclick="checkInvite()">Check Status</button>
     <div id="message" class="message"></div>
   </div>
 
+  <!-- Result Section -->
+  <div class="result-container" id="result-section">
+    <img src="logo.jpeg" alt="Logo" class="logo" />
+    <div id="countdown-result"></div>
+    <div class="congrats-icon">🎉</div>
+    <div id="resultMessage" class="message"></div>
+    <button class="back-btn" onclick="goBack()">🔙 Check Another</button>
+  </div>
+
   <script>
-    // Countdown
     const eventDate = new Date("July 19, 2025 00:00:00").getTime();
     const countdownEl = document.getElementById("countdown");
+    const countdownResult = document.getElementById("countdown-result");
+
     setInterval(() => {
       const now = new Date().getTime();
       const distance = eventDate - now;
@@ -185,43 +187,49 @@
       const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-      countdownEl.innerHTML = `🕒 Event starts in ${days}d ${hours}h ${minutes}m ${seconds}s`;
+      const text = `🕒 Event starts in ${days}d ${hours}h ${minutes}m ${seconds}s`;
+      countdownEl.innerText = text;
+      countdownResult.innerText = text;
     }, 1000);
 
     function loadGuestList() {
       return fetch(`list.json?${Date.now()}`)
-        .then(res => res.json())
-        .catch(err => {
-          document.getElementById("message").innerHTML = "❌ Failed to load guest list.";
-          console.error(err);
+        .then(response => response.json())
+        .catch(error => {
+          document.getElementById("message").innerText = "❌ Failed to load guest list.";
+          console.error("Fetch error:", error);
         });
     }
 
     async function checkInvite() {
       const input = document.getElementById("phoneInput").value.trim();
-      const messageDiv = document.getElementById("message");
       const data = await loadGuestList();
+      const messageDiv = document.getElementById("message");
+      const resultDiv = document.getElementById("resultMessage");
 
       if (data && data[input]) {
         const name = data[input];
-
-        // Clear previous message and update UI
-        messageDiv.innerHTML = `
-          <div class="congrats-display">
-            <div class="emoji">🎉</div>
-            <div class="success">
-              Congratulations <span style="color: #d63384;">${name}</span>!<br><br>
-              You have been selected to attend <strong>The SheDiamond Event</strong><br>
-              on <strong>Saturday, 28th June 2025</strong>.<br><br>
-              Your reservation has been sent to <strong>${input}</strong> via SMS.<br><br>
-              📞 Kindly reach out to <strong>Admin Faith B.</strong> if you did not receive it.
-            </div>
-          </div>
+        resultDiv.innerHTML = `
+          <strong style="color: #d63384;">Congratulations ${name}!</strong><br><br>
+          You have been selected to attend <strong>The SheDiamond Event</strong><br>
+          on <strong>Saturday, 28th June 2025</strong>.<br><br>
+          Your reservation has been sent to <strong>${input}</strong> via SMS.<br><br>
+          📞 Kindly reach out to <strong>Admin Faith B.</strong> if you didn’t receive it.
         `;
+        // Show result screen
+        document.getElementById("checker-section").style.display = "none";
+        document.getElementById("result-section").style.display = "block";
       } else {
-        messageDiv.innerHTML = `❌ This number (<strong>${input}</strong>) is <strong>not on the invitation list</strong>.<br>Please contact Admin for clarification.`;
+        messageDiv.innerHTML = `❌ This number (<strong>${input}</strong>) is <strong>not on the invitation list</strong>.<br>Please contact Admin.`;
         messageDiv.className = "message error";
       }
+    }
+
+    function goBack() {
+      document.getElementById("result-section").style.display = "none";
+      document.getElementById("checker-section").style.display = "block";
+      document.getElementById("phoneInput").value = "";
+      document.getElementById("message").innerText = "";
     }
 
     document.getElementById("phoneInput").addEventListener("keyup", function(e) {
