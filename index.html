@@ -132,7 +132,7 @@
   </style>
 </head>
 <body>
-  <!-- Sparkle effect background -->
+  <!-- Sparkle effect -->
   <script>
     for (let i = 0; i < 25; i++) {
       const sparkle = document.createElement("div");
@@ -156,7 +156,7 @@
   </div>
 
   <script>
-    // Countdown to event date
+    // Countdown Timer
     const eventDate = new Date("July 19, 2025 00:00:00").getTime();
     const countdownEl = document.getElementById("countdown");
     setInterval(() => {
@@ -169,43 +169,41 @@
       countdownEl.innerHTML = `🕒 Event starts in ${days}d ${hours}h ${minutes}m ${seconds}s`;
     }, 1000);
 
-    let selectedGuests = {};
-
-    function loadGuestList() {
-  return fetch(`list.json?${Date.now()}`)
-    .then(response => response.json())
-    .catch(error => {
-      document.getElementById("message").innerHTML = "❌ Failed to load guest list.";
-      console.error("Fetch error:", error);
-    });
-}
-      .catch(error => {
-        document.getElementById("message").innerHTML = "❌ Failed to load guest list. Please try again later.";
+    // Load guest list with cache busting
+    async function loadGuestList() {
+      try {
+        const res = await fetch(`list.json?${Date.now()}`);
+        return await res.json();
+      } catch (error) {
+        document.getElementById("message").innerHTML = "❌ Failed to load guest list.";
         console.error("Fetch error:", error);
-      });
+        return null;
+      }
+    }
 
+    // Check Invitation
     async function checkInvite() {
-  const input = document.getElementById("phoneInput").value.trim();
-  const messageDiv = document.getElementById("message");
+      const input = document.getElementById("phoneInput").value.trim();
+      const messageDiv = document.getElementById("message");
+      const data = await loadGuestList();
 
-  const data = await loadGuestList();
+      if (data && data[input]) {
+        const name = data[input];
+        messageDiv.innerHTML = `
+          🎉 <strong>Congratulations ${name}!</strong><br><br>
+          You have been selected to attend <strong>The SheDiamond Event</strong><br>
+          on <strong>Saturday, 28th June 2025</strong>.<br><br>
+          Your reservation has been sent to <strong>${input}</strong> via SMS.<br><br>
+          📞 Kindly reach out to <strong>Admin Faith B.</strong> if you did not receive it.
+        `;
+        messageDiv.className = "message success";
+      } else {
+        messageDiv.innerHTML = `❌ This number (<strong>${input}</strong>) is <strong>not on the invitation list</strong>.<br>Please contact Admin for clarification.`;
+        messageDiv.className = "message error";
+      }
+    }
 
-  if (data && data[input]) {
-    const name = data[input];
-    messageDiv.innerHTML = `
-      🎉 <strong>Congratulations ${name}!</strong><br><br>
-      You have been selected to attend <strong>The SheDiamond Event</strong><br>
-      on <strong>Saturday, 28th June 2025</strong>.<br><br>
-      Your reservation has been sent to <strong>${input}</strong> via SMS.<br><br>
-      📞 Kindly reach out to <strong>Admin Faith B.</strong> if you did not receive it.
-    `;
-    messageDiv.className = "message success";
-  } else {
-    messageDiv.innerHTML = `❌ This number (<strong>${input}</strong>) is <strong>not on the invitation list</strong>.<br>Please contact Admin for clarification.`;
-    messageDiv.className = "message error";
-  }
-}
-
+    // Enable Enter key
     document.getElementById("phoneInput").addEventListener("keyup", function(e) {
       if (e.key === "Enter") checkInvite();
     });
