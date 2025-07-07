@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SheDiamond Invitation Checker</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: url('flyer.jpg') no-repeat center center fixed;
+      background-size: cover;
+      animation: fadeIn 2s ease-in-out;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.03);
+        opacity: 0.95;
+      }
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      max-width: 500px;
+      margin: 4rem auto;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      text-align: center;
+      animation: slideFadeIn 1.5s ease forwards;
+    }
+
+    .logo {
+      max-width: 120px;
+      margin: 0 auto 1rem;
+      animation: pulse 6s ease-in-out infinite;
+    }
+
+    h1 {
+      color: #d63384;
+      margin-bottom: 1rem;
+    }
+
+    #countdown, #countdownCongrats {
+      font-size: 16px;
+      font-weight: bold;
+      margin-top: -5px;
+      margin-bottom: 15px;
+      color: #444;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border: 2px solid #d63384;
+      box-shadow: 0 0 8px rgba(214, 51, 132, 0.6);
+      transition: 0.3s ease;
+    }
+
+    button {
+      background-color: #d63384;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      margin-top: 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #b92c6a;
+    }
+
+    .message {
+      margin-top: 1.5rem;
+      font-size: 17px;
+    }
+
+    .success { color: green; }
+    .error { color: red; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="container" id="mainContainer">
+    <img src="logo.jpeg" alt="SheDiamond Logo" class="logo" />
+    <h1>Check Your Invitation</h1>
+    <div id="countdown"></div>
+    <p>Enter your phone number to verify if you're invited:</p>
+    <input type="text" id="phoneInput" placeholder="e.g. 08012345678" />
+    <br/>
+    <button onclick="checkInvite()">Check Status</button>
+    <div id="message" class="message"></div>
+  </div>
+
+  <!-- Congrats screen container -->
+  <div id="congratsContainer" class="container hidden">
+    <img src="logo.jpeg" alt="SheDiamond Logo" class="logo" />
+    <div id="countdownCongrats"></div>
+    <div style="font-size: 60px; margin: 1rem 0;">🎉</div>
+    <div id="congratsMessage" class="message success" style="font-size: 18px;"></div>
+    <button onclick="resetForm()">🔁 Check Another Number</button>
+  </div>
+
+  <script>
+    const eventDate = new Date("July 19, 2025 00:00:00").getTime();
+    setInterval(() => {
+      const now = new Date().getTime();
+      const distance = eventDate - now;
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      const countdownStr = `🕒 Event starts in ${days}d ${hours}h ${minutes}m ${seconds}s`;
+      document.getElementById("countdown").innerHTML = countdownStr;
+      document.getElementById("countdownCongrats").innerHTML = countdownStr;
+    }, 1000);
+
+    function loadGuestList() {
+      return fetch(`list.json?${Date.now()}`)
+        .then(response => response.json())
+        .catch(error => {
+          document.getElementById("message").innerHTML = "❌ Failed to load guest list.";
+          console.error("Fetch error:", error);
+        });
+    }
+
+    async function checkInvite() {
+      const input = document.getElementById("phoneInput").value.trim();
+      const messageDiv = document.getElementById("message");
+      const data = await loadGuestList();
+
+      if (data && data[input]) {
+        const name = data[input];
+        document.getElementById("mainContainer").classList.add("hidden");
+        document.getElementById("congratsContainer").classList.remove("hidden");
+        document.getElementById("congratsMessage").innerHTML = `
+          <strong>Congratulations ${name}!</strong><br><br>
+          You’ve been selected to attend <strong>The SheDiamond Event</strong><br>
+          on <strong>Saturday, 28th June 2025</strong>.<br><br>
+          Your reservation was sent to <strong>${input}</strong> via SMS.<br><br>
+          📞 Please contact Admin Faith B. if you didn’t receive it.
+        `;
+      } else {
+        messageDiv.innerHTML = \`❌ This number (<strong>\${input}</strong>) is <strong>not on the invitation list</strong>.<br>Please contact Admin for clarification.\`;
+        messageDiv.className = "message error";
+      }
+    }
+
+    function resetForm() {
+      document.getElementById("congratsContainer").classList.add("hidden");
+      document.getElementById("mainContainer").classList.remove("hidden");
+      document.getElementById("phoneInput").value = "";
+      document.getElementById("message").innerHTML = "";
+    }
+
+    document.getElementById("phoneInput").addEventListener("keyup", function(e) {
+      if (e.key === "Enter") checkInvite();
+    });
+  </script>
+</body>
+</html>
