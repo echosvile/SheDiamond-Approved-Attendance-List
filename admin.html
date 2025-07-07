@@ -66,11 +66,17 @@
   <script>
     const correctUsername = "Faith";
     const correctPassword = "1126";
+    let githubToken = "";
 
     function login() {
       const u = document.getElementById("username").value;
       const p = document.getElementById("password").value;
       if (u === correctUsername && p === correctPassword) {
+        githubToken = prompt("🔐 Enter your GitHub token:");
+        if (!githubToken) {
+          document.getElementById("loginMsg").innerText = "GitHub token is required.";
+          return;
+        }
         document.getElementById("login").classList.add("hidden");
         document.getElementById("dashboard").classList.remove("hidden");
         document.getElementById("loginMsg").innerText = "";
@@ -79,6 +85,6 @@
       }
     }
   </script>
-  <script src="admin.js" defer></script>
+  <script src="admin.js"></script>
 </body>
 </html>
