@@ -1,38 +1,28 @@
 
-// admin.js — handles adding new entries and committing to GitHub
-
 async function addGuestToList(name, number) {
-  const token = "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"; // Replace this with your actual GitHub token
+  const token = githubToken;
   const repo = "SheDiamond-Approved-Attendance-List";
   const username = "echosvile";
   const file = "list.json";
-
   const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/${file}`;
 
   try {
-    // Get current list.json content and SHA
     const getRes = await fetch(apiUrl, {
       headers: { Authorization: `token ${token}` }
     });
 
     if (!getRes.ok) {
       const errorText = await getRes.text();
-      console.error("GitHub GET Error:", errorText);
-      alert("❌ GitHub rejected the request. Check your token and permissions.");
-      return;
+      throw new Error("GitHub Fetch Error: " + errorText);
     }
 
     const getData = await getRes.json();
     const content = JSON.parse(atob(getData.content));
     const sha = getData.sha;
 
-    // Insert new guest entry at the top
     const updatedList = { [number]: name, ...content };
-
-    // Encode new list.json
     const encoded = btoa(JSON.stringify(updatedList, null, 2));
 
-    // Commit back to GitHub
     const commitRes = await fetch(apiUrl, {
       method: "PUT",
       headers: {
@@ -47,14 +37,16 @@ async function addGuestToList(name, number) {
     });
 
     if (commitRes.ok) {
-      alert(`✅ ${name} (${number}) added successfully.`);
+      document.getElementById("status").innerHTML = `<span class='success'>✅ ${name} (${number}) added successfully.</span>`;
+      document.getElementById("number").value = "";
+      document.getElementById("name").value = "";
     } else {
-      const putError = await commitRes.text();
-      console.error("GitHub PUT Error:", putError);
-      alert("❌ Failed to commit to GitHub.");
+      const errorText = await commitRes.text();
+      document.getElementById("status").innerHTML = "<span class='error'>❌ Failed to commit to GitHub.</span>";
+      console.error("Commit error:", errorText);
     }
   } catch (err) {
-    alert("❌ Error occurred. Check console.");
+    document.getElementById("status").innerHTML = "<span class='error'>❌ Error occurred. Check console.</span>";
     console.error(err);
   }
 }
