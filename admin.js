@@ -1,4 +1,3 @@
-
 async function addGuestToList(name, number) {
   const token = githubToken;
   const repo = "SheDiamond-Approved-Attendance-List";
@@ -19,6 +18,15 @@ async function addGuestToList(name, number) {
     const getData = await getRes.json();
     const content = JSON.parse(atob(getData.content));
     const sha = getData.sha;
+
+    // 🔄 Check for duplicate entry
+    if (content[number]) {
+      const confirmReplace = confirm(`⚠️ Number ${number} already exists for "${content[number]}". Do you want to replace it with "${name}"?`);
+      if (!confirmReplace) {
+        document.getElementById("status").innerHTML = "<span class='error'>❌ Action cancelled by user.</span>";
+        return;
+      }
+    }
 
     const updatedList = { [number]: name, ...content };
     const encoded = btoa(JSON.stringify(updatedList, null, 2));
